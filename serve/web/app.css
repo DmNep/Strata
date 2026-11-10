@@ -82,7 +82,7 @@ main { flex: 1; min-height: 0; display: flex; }
 
 /* ---------------------------------------------------------------- monitor */
 .view--monitor, .view--about { overflow-y: auto; }
-.monitor, .about { max-width: min(100%, 1920px); width: 100%; margin: 0 auto; padding: var(--st-s-6); display: flex; flex-direction: column;
+.monitor, .about, .experts { max-width: min(100%, 1920px); width: 100%; margin: 0 auto; padding: var(--st-s-6); display: flex; flex-direction: column;
                    gap: var(--st-s-5); }
 .state-card { display: flex; flex-direction: column; gap: var(--st-s-3); }
 .state-card__head { display: flex; align-items: center; gap: var(--st-s-4); flex-wrap: wrap; }
@@ -341,3 +341,24 @@ main { flex: 1; min-height: 0; display: flex; }
 /* a message may use the room a wide window gives the chat column (#3176 widened the column; the kit's 720px kept the messages narrow in it) */
 .st-msg { max-width: min(100%, 900px); }
 .st-toast .st-btn { white-space: nowrap; }
+
+/* Experts tab (GET /api/expert-heat): the adaptive tier's own rank table as a grid, two
+   half-width blocks stacked (first/second half of each layer's experts) so it fits without
+   horizontal scroll. See serve/web/experts.js. */
+.experts { max-width: min(100%, 1400px); overflow: auto; }
+.experts .st-card { display: flex; flex-direction: column; gap: var(--st-s-3); }
+/* a fixed, semi-transparent grey (not --st-line) so the per-cell borders stay visible against both the
+   pale light-theme cells and the near-black low end of the dark-theme ramp - --st-line alone nearly
+   vanished against light-theme cells close to it in lightness */
+.experts-grid { display: grid; gap: 1px; background: rgba(128, 128, 128, .5); border: 1px solid rgba(128, 128, 128, .5); border-radius: 4px; overflow: hidden; }
+.experts-grid + .experts-grid { margin-top: var(--st-s-2); }
+.experts-cell { aspect-ratio: 1 / 2.2; }
+.experts-legend { display: flex; align-items: center; gap: var(--st-s-2); flex-wrap: wrap; }
+/* app.js always sets html[data-theme] explicitly (light or dark, never unset) before paint, so the
+   attribute selector alone is enough here - no prefers-color-scheme fallback needed */
+.experts-gradient { width: 120px; height: 10px; border-radius: 3px; background: linear-gradient(90deg, #0d1118, #3a2416, #7a3f1d, #ff7a30); }
+[data-theme="light"] .experts-gradient { background: linear-gradient(90deg, #f3e3d3, #e8ab6e, #d9772e, #a85412); }
+.experts-dot { width: 10px; height: 10px; border-radius: 2px; background: hsl(30 90% 70%); outline: 1px solid #2dd4bf; outline-offset: 1px; }
+@media (max-width: 760px) {
+  .experts { padding: var(--st-s-3); }
+}
