@@ -325,6 +325,8 @@ main { flex: 1; min-height: 0; display: flex; }
 .drawer-group__title { margin: 0; font-size: var(--st-fs-base); font-weight: var(--st-fw-bold); color: var(--st-ink); }
 .seg--3 { grid-template-columns: repeat(3, 1fr); }
 .seg--3 button { padding: 0 4px; }
+.seg--2 { grid-template-columns: repeat(2, auto); display: inline-grid; }
+.seg--2 button { padding: 0 14px; white-space: nowrap; }
 #lang { width: 100%; }
 @media (max-width: 640px) {
   .chat-settings-label, .composer-hint { display: none; }
@@ -359,6 +361,19 @@ main { flex: 1; min-height: 0; display: flex; }
 .experts-gradient { width: 120px; height: 10px; border-radius: 3px; background: linear-gradient(90deg, #0d1118, #3a2416, #7a3f1d, #ff7a30); }
 [data-theme="light"] .experts-gradient { background: linear-gradient(90deg, #f3e3d3, #e8ab6e, #d9772e, #a85412); }
 .experts-dot { width: 10px; height: 10px; border-radius: 2px; background: hsl(30 90% 70%); outline: 1px solid #2dd4bf; outline-offset: 1px; }
+.experts-mode-row { display: flex; align-items: center; gap: var(--st-s-3); flex-wrap: wrap; }
+.experts-reset { font-size: var(--st-fs-xs); color: var(--st-ink-muted); background: transparent;
+                 border: 1px solid var(--st-line); border-radius: var(--st-r-sm); padding: 4px 10px; cursor: pointer; }
+.experts-reset:hover { color: var(--st-ink); border-color: var(--st-ink-muted); }
+.experts-gradient--stability { background: linear-gradient(90deg, #0d1118, #0f3a35, #15766b, #2dd4bf); }
+[data-theme="light"] .experts-gradient--stability { background: linear-gradient(90deg, #eef7f5, #a9e2d9, #4fc3b4, #0f9d8c); }
+/* replaces the native title tooltip, which the browser renders with its own fixed OS colors
+   regardless of page theme - this one uses the app's own tokens so it follows light/dark like
+   everything else in the tab */
+.experts-tooltip { position: fixed; z-index: 50; pointer-events: none; max-width: 280px;
+                    padding: 4px 8px; border-radius: var(--st-r-sm); border: 1px solid var(--st-line);
+                    background: var(--st-surface); color: var(--st-ink); box-shadow: var(--st-sh-card);
+                    font-size: var(--st-fs-xs); line-height: 1.4; }
 @media (max-width: 760px) {
   .experts { padding: var(--st-s-3); }
 }

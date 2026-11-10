@@ -201,16 +201,26 @@
       </div>
       <div class="st-card" id="experts-card">
         <div class="req-head"><span class="card-title">Expert map</span><span class="muted small" id="experts-stat">&ndash;</span></div>
-        <p class="muted small">Rows = layers, split into two halves side by side (first half of experts on top, second
+        <div class="experts-mode-row">
+          <div class="seg seg--2" id="experts-mode" role="radiogroup" aria-label="View">
+            <button type="button" role="radio" data-v="now" aria-checked="true">Now</button><button type="button" role="radio" data-v="stability" aria-checked="false">Residency stability</button>
+          </div>
+          <button type="button" class="experts-reset" id="experts-reset" hidden>Reset window</button>
+        </div>
+        <p class="muted small" id="experts-mode-help">Rows = layers, split into two halves side by side (first half of experts on top, second
           half below), columns = experts. A bright outline = the expert is physically resident in VRAM right now;
           the fill color is how highly ranked it is in the adaptive tier's own history otherwise.</p>
         <div id="experts-grid-top" class="experts-grid"></div>
         <div id="experts-grid-bottom" class="experts-grid"></div>
-        <div class="experts-legend">
+        <div class="experts-legend" id="experts-legend-now">
           <span class="muted small">cold</span><div class="experts-gradient"></div><span class="muted small">warm (historical rank)</span>
           <span class="experts-dot"></span><span class="muted small">resident in VRAM right now</span>
         </div>
+        <div class="experts-legend" id="experts-legend-stability" hidden>
+          <span class="muted small">never resident</span><div class="experts-gradient experts-gradient--stability"></div><span class="muted small">resident every poll</span>
+        </div>
       </div>
+      <div id="experts-tooltip" class="experts-tooltip" hidden></div>
     </div>
   </section>
 
