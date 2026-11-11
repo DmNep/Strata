@@ -27,6 +27,8 @@
       <svg class="st-icon st-icon--sm"><use href="web/sprite.svg#i-image"/></svg><span data-i18n="tab.images">Images</span></button>
     <button class="st-tab" role="tab" id="tab-btn-monitor" aria-controls="view-monitor" aria-selected="false" data-tab="monitor">
       <svg class="st-icon st-icon--sm"><use href="web/sprite.svg#i-activity"/></svg><span data-i18n="tab.monitor">Monitor</span></button>
+    <button class="st-tab" role="tab" id="tab-btn-experts" aria-controls="view-experts" aria-selected="false" data-tab="experts">
+      <svg class="st-icon st-icon--sm"><use href="web/sprite.svg#i-bolt"/></svg><span>Experts</span></button>
     <button class="st-tab" role="tab" id="tab-btn-about" aria-controls="view-about" aria-selected="false" data-tab="about">
       <svg class="st-icon st-icon--sm"><use href="web/sprite.svg#i-info"/></svg><span data-i18n="tab.about">About</span></button>
   </nav>
@@ -190,6 +192,38 @@
     </div>
   </section>
 
+  <!-- ============================ Experts ============================ -->
+  <section class="view view--experts" id="view-experts" role="tabpanel" aria-labelledby="tab-btn-experts" hidden>
+    <div class="experts">
+      <div class="st-card" id="experts-off" hidden>
+        <span class="card-title">Expert map</span>
+        <p class="muted" id="experts-off-text">This server was started without a run config, so there is nothing to read.</p>
+      </div>
+      <div class="st-card" id="experts-card">
+        <div class="req-head"><span class="card-title">Expert map</span><span class="muted small" id="experts-stat">&ndash;</span></div>
+        <div class="experts-mode-row">
+          <div class="seg seg--2" id="experts-mode" role="radiogroup" aria-label="View">
+            <button type="button" role="radio" data-v="now" aria-checked="true">Now</button><button type="button" role="radio" data-v="stability" aria-checked="false">Residency stability</button>
+          </div>
+          <button type="button" class="experts-reset" id="experts-reset" hidden>Reset window</button>
+        </div>
+        <p class="muted small" id="experts-mode-help">Rows = layers, split into two halves side by side (first half of experts on top, second
+          half below), columns = experts. A bright outline = the expert is physically resident in VRAM right now;
+          the fill color is how highly ranked it is in the adaptive tier's own history otherwise.</p>
+        <div id="experts-grid-top" class="experts-grid"></div>
+        <div id="experts-grid-bottom" class="experts-grid"></div>
+        <div class="experts-legend" id="experts-legend-now">
+          <span class="muted small">cold</span><div class="experts-gradient"></div><span class="muted small">warm (historical rank)</span>
+          <span class="experts-dot"></span><span class="muted small">resident in VRAM right now</span>
+        </div>
+        <div class="experts-legend" id="experts-legend-stability" hidden>
+          <span class="muted small">never resident</span><div class="experts-gradient experts-gradient--stability"></div><span class="muted small">resident every poll</span>
+        </div>
+      </div>
+      <div id="experts-tooltip" class="experts-tooltip" hidden></div>
+    </div>
+  </section>
+
   <!-- ============================ About ============================ -->
   <section class="view view--about" id="view-about" role="tabpanel" aria-labelledby="tab-btn-about" hidden>
     <div class="about">
@@ -316,6 +350,7 @@
 <script src="web/history.js"></script>
 <script src="web/chatstore.js"></script>
 <script src="web/chats-ui.js"></script>
+<script src="web/experts.js"></script>
 <script src="web/app.js"></script>
 </body>
 </html>

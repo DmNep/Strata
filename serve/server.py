@@ -3961,6 +3961,26 @@ def profile_shape(path: str) -> tuple[int, int] | None:
     return (nl, ne) if size >= 24 + 4 * n else None
 
 
+def expert_profile_table(path: str) -> dict | None:
+    """The full rank table behind profile_shape()'s header: table[layer*n_expert+expert] = rank (-1 = never
+    ranked), plus how many of the layer*expert cells actually got a rank.  For GET /api/expert-heat (the web
+    app's Experts tab), not used by the engine itself."""
+    try:
+        with open(path, "rb") as f:
+            data = f.read()
+    except OSError:
+        return None
+    if len(data) < 24 or data[:4] != b"STRP":
+        return None
+    _, nl, ne, n_ranked, _ = struct.unpack_from("<5I", data, 4)
+    off = 24 + 4 * n_ranked           # the ranked (layer, expert) pairs: skip, the table already encodes rank
+    count = nl * ne
+    if len(data) < off + 4 * count:
+        return None
+    table = struct.unpack_from(f"<{count}i", data, off)
+    return {"n_layers": nl, "n_expert": ne, "n_ranked": n_ranked, "table": table}
+
+
 def learned_profile_args(cfg: dict, args: list[str]) -> list[str]:
     """#477 (opt-in): "expert_profile_save": "<path>" in the config has the engine (0.1.36+) save what its adaptive
     tier learned there - on QUIT and every "expert_profile_save_every" minutes (10 by default, 0 = at QUIT only) -
@@ -8036,6 +8056,10 @@ def make_handler(svc: Service):
                 if self._authorized():
                     self._config_get()
                 return
+            if path == "/api/expert-heat":                    # the Experts tab: the adaptive tier's rank table
+                if self._authorized():
+                    self._expert_heat_get()
+                return
             if path == "/mcp":
                 # the MCP servers, their state and tools (the web app's switch and Monitor card)
                 if self._authorized():
@@ -8435,6 +8459,34 @@ def make_handler(svc: Service):
                 self._json(500, {"error": {"type": "server_error", "message": f"the run config cannot be read: {e}"}})
                 return
             self._json(200, runconfig.view(cfg, svc.config_path))
+
+        def _expert_heat_get(self):
+            """GET /api/expert-heat (the Experts tab): the adaptive tier's current rank table, from the file
+            "expert_profile_save" in the run config points at - the same one --expert-profile-save-every keeps
+            current while the server runs.  {"enabled": false} when the config has no such key, so the tab can
+            say what to turn on instead of showing an empty grid."""
+            if not svc.config_path:
+                self._json(200, {"enabled": False, "reason": "no run config"})
+                return
+            try:
+                cfg = runconfig.load(svc.config_path)
+            except (OSError, ValueError) as e:
+                self._json(500, {"error": {"type": "server_error", "message": f"the run config cannot be read: {e}"}})
+                return
+            save = cfg.get("expert_profile_save")
+            if not isinstance(save, str) or not save.strip():
+                self._json(200, {"enabled": False,
+                                 "reason": "the run config has no \"expert_profile_save\" path"})
+                return
+            path = save if os.path.isabs(save) else os.path.join(cfg.get("cwd") or ".", save)
+            parsed = expert_profile_table(path)
+            if parsed is None:
+                self._json(200, {"enabled": True, "ready": False,
+                                 "reason": "no snapshot yet (it is written between requests)"})
+                return
+            self._json(200, {"enabled": True, "ready": True, "n_layers": parsed["n_layers"],
+                             "n_expert": parsed["n_expert"], "n_ranked": parsed["n_ranked"],
+                             "n_resident": svc.engine.info.get("expert_slots"), "table": parsed["table"]})
 
         def _config_post(self):
             """#564: change a few documented keys of the run config - JSON from Strata's own page only, as

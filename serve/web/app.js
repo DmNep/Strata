@@ -72,15 +72,18 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
   if (!saved) setTheme(e.matches ? "dark" : "light", false);
 });
 
+const TABS = ["chat", "images", "monitor", "experts", "about"];
 let tab = "chat";
 function showTab(name) {
-  tab = ["chat", "images", "monitor", "about"].includes(name) ? name : "chat";
+  tab = TABS.includes(name) ? name : "chat";
   for (const b of document.querySelectorAll(".st-tab")) b.setAttribute("aria-selected", String(b.dataset.tab === tab));
-  for (const v of ["chat", "images", "monitor", "about"]) $(`view-${v}`).hidden = v !== tab;
+  for (const v of TABS) $(`view-${v}`).hidden = v !== tab;
   if (tab === "images") $("img-prompt").focus();
   if (location.hash.slice(1) !== tab) history.replaceState(null, "", tab === "chat" ? location.pathname : `#${tab}`);
   if (tab === "chat") $("input").focus();
   if (tab === "monitor") loadMcp();
+  if (tab === "experts" && window.ExpertsTab) window.ExpertsTab.start();
+  if (tab !== "experts" && window.ExpertsTab) window.ExpertsTab.stop();
   if (tab === "about") loadConfig();
   if (lastMetrics) render(lastMetrics);
 }
